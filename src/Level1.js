@@ -21,25 +21,25 @@ class Level1 extends Phaser.Scene {
 
   create() {
     
-    var player;
-    var object;
-    var bombs;
-    var bomb;
-    var star;
-    var stars;
-    var bullets;
-    var bullet;
-    var obstacule;
-    var platforms;
+    // var player;
+    // var object;
+    // var bombs;
+    // var bomb;
+    // var star;
+    // var stars;
+    // var bullets;
+    // var bullet;
+    // var obstacule;
+    // var platforms;
     
-    var score = 0;
-    var gameOver = false;
-    var scoreText;
-    var gameOverText;
-    var obstaclesGroup;
-    var meta;
-    var wingame = false;
-    var winGameText;
+     var score = 0;
+    // var gameOver = false;
+    // var scoreText;
+    // var gameOverText;
+    // var obstaclesGroup;
+    // var meta;
+    // var wingame = false;
+    // var winGameText;
 
 
     console.log("Estamos no level 1");
@@ -51,7 +51,8 @@ class Level1 extends Phaser.Scene {
     this.gameSpeed = 5;
     this.platforms = this.add.tileSprite(0, height, width, 26, 'ground').setOrigin(0, 1);
     
-    this.physics.add.existing(platforms);
+    
+    this.physics.add.existing(this.platforms);
 
     // set the TileSprite's physics properties
     this.platforms.body.setCollideWorldBounds(true);
@@ -97,27 +98,12 @@ class Level1 extends Phaser.Scene {
     });
 
 
-    this.physics.add.existing(obstacule);
-    this.obstacule.body.setBounce(1);
-    this.physics.add.existing(meta);
-    this.physics.add.existing(stars);
-    this.physics.add.existing(bombs);
-   
+    this.physics.add.existing(this.obstacule);
+    //this.obstacule.body.setBounce(1);
+    this.physics.add.existing(this.meta);
+    this.physics.add.existing(this.stars);
+    this.physics.add.existing(this.bombs);
 
-  
-    // var objectGroup = this.add.group();
-
-    // var stars = this.physics.add.sprite(Phaser.Math.Between(50, 600),Phaser.Math.Between(50, 600), 'star');
-    // objectGroup.add(stars);
-    
-    // var randomObject = Phaser.Utils.Array.GetRandom(objectGroup.getChildren());
-    // randomObject.setVisible(true);
-
-   
-
-    
-
-    
     
     this.player = this.physics.add.sprite(0, height, 'dude')
    .setCollideWorldBounds(true)
@@ -145,25 +131,25 @@ class Level1 extends Phaser.Scene {
         repeat: -1
     });
 
-
-   
+    this.anims.create({
+        key: 'space',
+        frames: [ { key: 'dude', frame: 4 } ],
+        frameRate: 20
+    });
+    
     
     this.cursors = this.input.keyboard.createCursorKeys();
-    
 
     //  The score
     this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
-    
-
-    
-    this.physics.add.collider(platforms, obstacule, this.collisionPlat, null, this);
-    this.physics.add.collider(platforms, meta, this.collisionMeta, null, this);
-    this.physics.add.collider(platforms, stars, this.collisionPlatStar, null, this);
-    this.physics.add.collider(player, obstacule, this.collideOn, null, this);
-    this.physics.add.collider(player, meta, this.collideMeta, null, this);
-    this.physics.add.overlap(player, stars, this.collectStar, null, this);
-    this.physics.add.overlap(player, bombs, this.hitBomb, null, this);
+    this.physics.add.collider(this.platforms, this.obstacule, this.collisionPlat, null, this);
+    this.physics.add.collider(this.platforms, this.meta, this.collisionMeta, null, this);
+    //this.physics.add.collider(this.platforms, this.stars, this.collisionPlatStar, null, this);
+    this.physics.add.collider(this.player, this.obstacule);
+    this.physics.add.collider(this.player, this.meta, this.collideMeta, null, this);
+    this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
+    this.physics.add.overlap(this.player, this.bombs, this.hitBomb, null, this);
     //this.physics.add.collider(stars, platforms);
     
 
@@ -172,22 +158,41 @@ class Level1 extends Phaser.Scene {
   update() {
 
     
+    
     if (this.cursors.space.isDown )
     {
+        this.obstacule.getChildren().forEach(function(obstacule) {
+            //obstacule.x = 0;
+            console.log("disable obstcule");
+            obstacule.disableBody(true, true);
+        })
+        this.bombs.getChildren().forEach(function(bomb) {
+            //bomb.x = 0;
+            console.log("disable bomb");
+            bomb.disableBody(true, true);
+        })
+        this.player.setGravityY(3000);
+        this.player.anims.play('space', true);
+        //this.gameOver=0;
+        
+        //this.physics.add.collider(player, obstacule, collideOff, null, this);
+        console.log("Space pressed");
         this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
     } else if (this.cursors.space.isUp ) {
-        //scoreText = 0;
+        //this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
     }
      
 
     if (this.gameOver!=true)
     {
         this.player.setVelocityX(5);
-
+        
         this.player.anims.play('right', true);
         this.platforms.tilePositionX += this.gameSpeed;
+        
         this.obstacule.getChildren().forEach(function(object) {
-        this.object.x += -5;
+        object.x += -5;
+        
         //console.log(obstacule.x );
         });
         
@@ -198,136 +203,106 @@ class Level1 extends Phaser.Scene {
         this.player.anims.play('turn');
         this.platforms.tilePositionX = 0;
         this.obstacule.getChildren().forEach(function(object) {
-            this.object.x = 0;
-            this.object.disableBody(true, true);
+            object.x = 0;
+            object.disableBody(true, true);
         
         //console.log(obstacule.x );
         });
         this.stars.getChildren().forEach(function(star) {
-            this.star.x = 0;
-            this.star.disableBody(true, true);
+            star.x = 0;
+            star.disableBody(true, true);
         
         //console.log(obstacule.x );
         });
-        bombs.getChildren().forEach(function(bomb) {
+        this.bombs.getChildren().forEach(function(bomb) {
         bomb.x = 0;
         bomb.disableBody(true, true);
         
         //console.log(obstacule.x );
         });
 
-        meta.getChildren().forEach(function(meta) {
+        this.meta.getChildren().forEach(function(meta) {
         meta.x += 0;
         meta.disableBody(true, true);
         //console.log(obstacule.x );
         });
 
-        gameOverText = this.add.text(56, 56, 'Morreu', { fontSize: '32px', fill: '#000' });
+        this.gameOverText = this.add.text(56, 56, 'Morreu', { fontSize: '32px', fill: '#000' });
     }
 
-    if (wingame!=true){
+    if (this.wingame!=true){
         
-        meta.getChildren().forEach(function(meta) {
+        this.meta.getChildren().forEach(function(meta) {
         meta.x += -5;
-        //console.log(obstacule.x );
+        
         });
+        
     } else {
+        
         this.player.setVelocityX(0);
         this.physics.pause();
-        player.anims.play('turn');
-        platforms.tilePositionX = 0;
-        obstacule.getChildren().forEach(function(object) {
+        this.player.anims.play('turn');
+        this.platforms.tilePositionX = 0;
+        this.obstacule.getChildren().forEach(function(object) {
         object.x = 0;
         object.disableBody(true, true);
         
         //console.log(obstacule.x );
         });
-        stars.getChildren().forEach(function(star) {
+        this.stars.getChildren().forEach(function(star) {
         star.x = 0;
         star.disableBody(true, true);
         
         //console.log(obstacule.x );
         });
-        bombs.getChildren().forEach(function(bomb) {
+        this.bombs.getChildren().forEach(function(bomb) {
         bomb.x = 0;
         bomb.disableBody(true, true);
         
         //console.log(obstacule.x );
         });
 
-        meta.getChildren().forEach(function(meta) {
+        this.meta.getChildren().forEach(function(meta) {
         meta.x += 0;
         //meta.disableBody(true, true);
         //console.log(obstacule.x );
         });
-        winGameText = this.add.text(56, 56, 'Completed', { fontSize: '32px', fill: '#000' });
+        this.winGameText = this.add.text(56, 56, 'Completed', { fontSize: '32px', fill: '#000' });
     }
    
 
-    if (cursors.left.isDown)
+    if (this.cursors.left.isDown)
     {
-        player.setVelocityX(-160);
+        this.player.setVelocityX(-160);
 
-        player.anims.play('left', true);
+        this.player.anims.play('left', true);
     }
-    else if (cursors.right.isDown)
+    else if (this.cursors.right.isDown)
     {
-        player.setVelocityX(160);
+        this.player.setVelocityX(160);
 
-        player.anims.play('right', true);
+        this.player.anims.play('right', true);
     } 
     
-    if (cursors.up.isDown && player.body.onFloor())
+    if (this.cursors.up.isDown && this.player.body.onFloor())
     {
-        player.setVelocityY(-1500);
+        this.player.setVelocityY(-1500);
         //player.setBounce(0.2);
         
     } 
+    
     
 
 
 
   }
 
-   collideOn (player, obstacule)
-{
-    if (cursors.space.isUp )
-    {
-        obstacule.disableBody(true, true);
-        //this.physics.add.collider(player, obstacule, collideOff, null, this);
-        console.log("A pressed");
-        
-        
-    } else {
-        
-    
-        this.physics.pause();
-        console.log("morreu");
-        gameOverText = this.add.text(56, 56, 'Morreu', { fontSize: '32px', fill: '#000' });
-        //obstacule.disableBody(true, true);
-        player.anims.play('turn');
-        gameOver = true;
-    
-    }
-}
-
-// function collideOff (player, obstacule)
-// {
-    
-//         //this.physics.pause();
-//         console.log("superhomem");
-       
-//         //obstacule.disableBody(true, true);
-//         //player.anims.play('turn');
-//         gameOver = false;
-    
-    
-// }
+   
 
  collideMeta (player, meta)
 {
     
-        wingame=true;
+    this.wingame=true;
         
     
     
@@ -338,7 +313,7 @@ class Level1 extends Phaser.Scene {
     console.log("pimba");
     obstacule.body.setCollideWorldBounds(true);
     //console.log(obstacule.x)
-    if (obstacule.x<50){
+    if (obstacule.x<25){
         obstacule.disableBody(true, true);
     }
     
@@ -348,62 +323,54 @@ class Level1 extends Phaser.Scene {
 {
     console.log("Meta");
     meta.body.setCollideWorldBounds(true);
-    //console.log(obstacule.x)
-    // if (meta.x<50){
-    //     meta.disableBody(true, true);
-    // }
+    
     
 }
 
- collisionPlatStar (platforms, stars)
-{
-    console.log("pimba");
-    obstacule.body.setCollideWorldBounds(true);
-    //console.log(obstacule.x)     
+//  collisionPlatStar (platforms, stars)
+// {
+//     console.log("pimba");
+//     this.stars.body.setCollideWorldBounds(true);
+//     //console.log(obstacule.x)     
 
-    if (stars.y > 50)
-            {
-                stars.disableBody(true, true);
-                // console.log("passou o fundo");
+//     if (this.stars.y > 50)
+//             {
+//                 this.stars.disableBody(true, true);
                 
-                //  var objectGroup = this.add.group();
-                //  var stars = this.physics.add.sprite(Phaser.Math.Between(50, 500),0, 'star');
-                //  objectGroup.add(stars);
-                //  var randomObject = Phaser.Utils.Array.GetRandom(objectGroup.getChildren());
-                //  randomObject.setVisible(true);    
 
-    }
+//     }
     
-}
+// }
 
      addObject() {
         
     var object = this.physics.add.sprite(800, 600, 'object');
-    obstacule.add(object);
-    obstacule.body.setCollideWorldBounds(true);
+    this.obstacule.add(object);
+    this.obstacule.body.setCollideWorldBounds(true);
+    
     }
 
      addFinishLine() {
         
         console.log("Meta");
         var finishline = this.physics.add.sprite(770, 600, 'finishline');
-        meta.add(finishline);
-        meta.body.setCollideWorldBounds(true);
+        this.meta.add(finishline);
+        this.meta.body.setCollideWorldBounds(true);
         }
 
      addStar() {
         console.log("Estrela a cair");
         var star = this.physics.add.sprite(Phaser.Math.Between(50, 500),0, 'star');
-        stars.add(star);
-        stars.body.setCollideWorldBounds(false);
+        this.stars.add(star);
+        this.stars.body.setCollideWorldBounds(true);
         
         }
 
          addBomb() {
         console.log("Bomba a cair");
         var bomb = this.physics.add.sprite(Phaser.Math.Between(50, 500),0, 'bomb');
-        bombs.add(bomb);
-        bombs.body.setCollideWorldBounds(false);
+        this.bombs.add(bomb);
+        this.bombs.body.setCollideWorldBounds(true);
         
         }
     
@@ -413,9 +380,9 @@ class Level1 extends Phaser.Scene {
             stars.disableBody(true, true);
 
             //  Add and update the score
-            score += 10;
-            console.log(score);
-            scoreText.setText('Score: ' + score);
+            this.score += 10;
+            console.log(this.score);
+            this.scoreText.setText('Score: ' + this.score);
 
             
             
@@ -425,11 +392,11 @@ class Level1 extends Phaser.Scene {
         {
             this.physics.pause();
 
-            player.setTint(0xff0000);
+            this.player.setTint(0xff0000);
 
-            player.anims.play('turn');
+            this.player.anims.play('turn');
 
-            gameOver = true;
+            this.gameOver = true;
         }
 
 }
