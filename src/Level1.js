@@ -12,6 +12,7 @@ class Level1 extends Phaser.Scene {
     this.load.image('object', 'assets/obstacule3.png');
     this.load.image('finishline', 'assets/finishline.png');
     this.load.image('star', 'assets/star.png');
+    this.load.image('ufo', 'assets/ufo.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('bullet', 'assets/bullet.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
@@ -60,6 +61,8 @@ class Level1 extends Phaser.Scene {
     this.platforms.body.setBounce(0);
     //platforms.body.setVelocity(200, 200);
 
+    
+
     //add variables to functions 
     this.obstacule = this.add.group();
 
@@ -69,6 +72,11 @@ class Level1 extends Phaser.Scene {
     this.stars = this.add.group();
 
     this.bombs = this.add.group();
+
+    this.ufo = this.add.group();
+
+   
+    
 
     this.time.addEvent({
     delay: 2000, //Phaser.Math.Between(100, 2000),
@@ -99,12 +107,21 @@ class Level1 extends Phaser.Scene {
     loop: true
     });
 
+    this.time.addEvent({
+    delay: 2000, //Phaser.Math.Between(100, 2000),
+    callback: this.addUfo,
+    callbackScope: this,
+    loop: true
+    });
 
-    this.physics.add.existing(this.obstacule);
-    this.obstacule.body.setCollideWorldBounds(true);
+   
+
+    //this.physics.add.existing(this.obstacule);
+    //this.obstacule.body.setCollideWorldBounds(true);
     this.physics.add.existing(this.meta);
     this.physics.add.existing(this.stars);
     this.physics.add.existing(this.bombs);
+    this.physics.add.existing(this.ufo);
 
     
     this.player = this.physics.add.sprite(0, height, 'dude')
@@ -112,6 +129,9 @@ class Level1 extends Phaser.Scene {
    .setGravityY(3000)
    .setOrigin(0, 1);
    //this.createControll();
+
+    
+
 
    this.anims.create({
         key: 'left',
@@ -143,10 +163,11 @@ class Level1 extends Phaser.Scene {
     this.physics.add.collider(this.platforms, this.obstacule, this.collisionPlat, null, this);
     this.physics.add.collider(this.platforms, this.meta, this.collisionMeta, null, this);
     //this.physics.add.collider(this.platforms, this.stars, this.collisionPlatStar, null, this);
-    this.physics.add.collider(this.player, this.obstacule);
+    this.physics.add.collider(this.player, this.obstacule, this.collidePlayerObstacule, null, this);
     this.physics.add.collider(this.player, this.meta, this.collideMeta, null, this);
     this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
     this.physics.add.overlap(this.player, this.bombs, this.hitBomb, null, this);
+    this.physics.add.overlap(this.player, this.ufo, this.hitUfo, null, this);
     //this.physics.add.collider(stars, platforms);
     
 
@@ -183,25 +204,29 @@ class Level1 extends Phaser.Scene {
     //       this.obstacule.body.setCollideWorldBounds(true);
     //       //this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
     //   }
-     
 
-    if (this.gameOver!=true)
-    {
+      this.ufo.body.setVelocityX(100);
         this.player.setVelocityX(5);
         
         this.player.anims.play('right', true);
+
+    if (this.gameOver!=true)
+    {
+        
         this.platforms.tilePositionX += this.gameSpeed;
         
         this.obstacule.getChildren().forEach(function(object) {
         object.x += -5;
-        
         //console.log(obstacule.x );
         });
+        this.ufo.getChildren().forEach(function(ufo){
+            ufo.x+= -5;
+        })
         
     } else {
         
         this.player.setVelocityX(0);
-        //this.physics.pause();
+        this.physics.pause();
         this.player.anims.play('turn');
         this.platforms.tilePositionX = 0;
         this.obstacule.getChildren().forEach(function(object) {
@@ -233,6 +258,10 @@ class Level1 extends Phaser.Scene {
         this.resetLevel();
         
             
+    }
+
+    if(this.colide=true){
+        this.player.setVelocityX(0);
     }
 
     if (this.wingame!=true){
@@ -302,7 +331,11 @@ class Level1 extends Phaser.Scene {
 
   }
 
-  
+        collidePlayerObstacule (player, obstacule){
+            this.colide = true;
+            console.log("colide");
+            
+        }
 
 
         collideMeta (player, meta)
@@ -376,7 +409,7 @@ class Level1 extends Phaser.Scene {
             
         var object = this.physics.add.sprite(800, 600, 'object');
         this.obstacule.add(object);
-        this.obstacule.body.setCollideWorldBounds(true);
+        //this.obstacule.body.setCollideWorldBounds(true);
         
         }
 
@@ -403,7 +436,27 @@ class Level1 extends Phaser.Scene {
         this.bombs.body.setCollideWorldBounds(true);
         
         }
-    
+
+        addUfo() {
+        console.log("Ufo");
+        var ufo = this.physics.add.sprite(800,Phaser.Math.Between(30, 500), 'ufo');
+        ufo.body.setCollideWorldBounds(false);
+        ufo.body.setAllowGravity(false);
+        this.ufo.body.setImmovable(true);
+        this.ufo.add(ufo);
+        ufo.setScale(0.1);
+        }
+        
+        hitUfo (player, ufo)
+        {
+            this.physics.pause();
+
+            this.player.setTint(0xff0000);
+
+            this.player.anims.play('turn');
+
+            this.gameOver = true;
+        }
         
          
 
