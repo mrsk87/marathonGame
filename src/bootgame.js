@@ -6,7 +6,7 @@ class bootgame extends Phaser.Scene {
 
   create() {
 
-    this.scene.start("Level1")
+    this.scene.start("Level2")
 
     // this.add.text(16, 16, 'Loading Game', { fontSize: '32px', fill: '#000' });
     // console.log("bootgame");

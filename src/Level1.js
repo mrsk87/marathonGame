@@ -9,38 +9,23 @@ class Level1 extends Phaser.Scene {
   preload() {
     this.load.image('sky', 'assets/sky2.png');
     this.load.image('ground', 'assets/ground3.png');
-    this.load.image('object', 'assets/obstacule3.png');
-    this.load.image('finishline', 'assets/finishline.png');
+    this.load.image('object', 'assets/fire.png');
+    this.load.image('finishline', 'assets/finishsprite.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('ufo', 'assets/ufo.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('bullet', 'assets/bullet.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.image('restartBtn', 'assets/restart.png');
   }
 
   
 
   create() {
     
-    // var player;
-    // var object;
-    // var bombs;
-    // var bomb;
-    // var star;
-    // var stars;
-    // var bullets;
-    // var bullet;
-    // var obstacule;
-    // var platforms;
+    this.gameOver=0;
+
     
-    //var score = 0;
-    // var gameOver = false;
-    // var scoreText;
-    // var gameOverText;
-    // var obstaclesGroup;
-    // var meta;
-    // var wingame = false;
-    // var winGameText;
 
     
 
@@ -75,7 +60,7 @@ class Level1 extends Phaser.Scene {
 
     this.ufo = this.add.group();
 
-   
+    
     
 
     this.time.addEvent({
@@ -168,6 +153,7 @@ class Level1 extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
     this.physics.add.overlap(this.player, this.bombs, this.hitBomb, null, this);
     this.physics.add.overlap(this.player, this.ufo, this.hitUfo, null, this);
+    this.physics.add.overlap(this.player, this.obstacule, this.hitFire, null, this);
     //this.physics.add.collider(stars, platforms);
     
 
@@ -179,31 +165,33 @@ class Level1 extends Phaser.Scene {
   update() {
 
     
-    // if (this.cursors.space.isDown )
-    //   {
+
+    
+    if (this.cursors.space.isDown )
+      {
         
-    //       console.log("Superhomem")
-    //       this.obstacule.getChildren().forEach(function(obstacule) {
-    //           //obstacule.x = 0;
-    //           console.log("disable obstcule");
-    //           obstacule.disableBody(true, true);
-    //       })
-    //       this.bombs.getChildren().forEach(function(bomb) {
-    //           //bomb.x = 0;
-    //           console.log("disable bomb");
-    //           bomb.disableBody(true, true);
-    //       })
+          console.log("Superhomem")
+          this.obstacule.getChildren().forEach(function(obstacule) {
+              //obstacule.x = 0;
+              console.log("disable obstcule");
+              obstacule.disableBody(true, true);
+          })
+          this.bombs.getChildren().forEach(function(bomb) {
+              //bomb.x = 0;
+              console.log("disable bomb");
+              bomb.disableBody(true, true);
+          })
           
-    //       this.gameOver=0;
+          this.gameOver=0;
           
-    //       //this.physics.add.collider(player, obstacule, collideOff, null, this);
-    //       console.log("Space pressed");
-    //       this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
-    //   } else if (this.cursors.space.isUp ) {
+          //this.physics.add.collider(player, obstacule, collideOff, null, this);
+          console.log("Space pressed");
+          this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
+      } else if (this.cursors.space.isUp ) {
         
-    //       this.obstacule.body.setCollideWorldBounds(true);
-    //       //this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
-    //   }
+          //this.obstacule.body.setCollideWorldBounds(true);
+          //this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
+      }
 
       this.ufo.body.setVelocityX(100);
         this.player.setVelocityX(5);
@@ -234,6 +222,7 @@ class Level1 extends Phaser.Scene {
             object.disableBody(true, true);
         
         //console.log(obstacule.x );
+        //Remover objetos final do jogo
         });
         this.stars.getChildren().forEach(function(star) {
             star.x = 0;
@@ -254,8 +243,22 @@ class Level1 extends Phaser.Scene {
         //console.log(obstacule.x );
         });
 
-        this.gameOverText = this.add.text(56, 56, 'Morreu', { fontSize: '32px', fill: '#000' });
-        this.resetLevel();
+        this.ufo.getChildren().forEach(function(ufo) {
+            ufo.x = 0;
+            ufo.disableBody(true, true);
+            
+            //console.log(obstacule.x );
+            });
+
+        this.gameOverText = this.add.text(56, 56, 'Morreu', { fontSize: '32px', fill: 'red' });
+
+        
+
+        this.botaoRestart();
+                
+           
+            
+        
         
             
     }
@@ -296,6 +299,13 @@ class Level1 extends Phaser.Scene {
         //console.log(obstacule.x );
         });
 
+        this.ufo.getChildren().forEach(function(ufo) {
+            ufo.x = 0;
+            ufo.disableBody(true, true);
+            
+            //console.log(obstacule.x );
+            });
+
         this.meta.getChildren().forEach(function(meta) {
         meta.x += 0;
         //meta.disableBody(true, true);
@@ -326,6 +336,12 @@ class Level1 extends Phaser.Scene {
         
     } 
     
+    if (this.cursors.up.isDown && !this.player.body.onFloor())
+    {
+        this.player.setVelocityY(-500);
+        //player.setBounce(0.2);
+        
+    } 
 
 
 
@@ -352,7 +368,7 @@ class Level1 extends Phaser.Scene {
             console.log("obstaculo na plataforma");
             obstacule.body.setCollideWorldBounds(true);
             //console.log(obstacule.x)
-            if (obstacule.x<25){
+            if (obstacule.x<45){
                 obstacule.disableBody(true, true);
             }
             
@@ -406,9 +422,12 @@ class Level1 extends Phaser.Scene {
         }
 
         addObject() {
-            
+        
         var object = this.physics.add.sprite(800, 600, 'object');
+              
         this.obstacule.add(object);
+        object.setScale(0.1);  
+
         //this.obstacule.body.setCollideWorldBounds(true);
         
         }
@@ -417,6 +436,7 @@ class Level1 extends Phaser.Scene {
             
             console.log("Meta");
             var finishline = this.physics.add.sprite(770, 600, 'finishline');
+            finishline.setScale(0.2);
             this.meta.add(finishline);
             this.meta.body.setCollideWorldBounds(true);
             }
@@ -457,12 +477,54 @@ class Level1 extends Phaser.Scene {
 
             this.gameOver = true;
         }
+
+        hitFire (player, fire)
+        {
+            this.physics.pause();
+
+            this.player.setTint(0xff0000);
+
+            this.player.anims.play('turn');
+
+            this.gameOver = true;
+        }
         
          
 
         resetLevel(){
             this.gameOver = 0;
             this.scene.start("bootgame");
+        }
+
+        botaoRestart(){
+            //Botao restart
+            const restartBtn = this.add.image(400, 300, 'restartBtn')
+            .setScale(0.1)
+            restartBtn.setInteractive();
+
+            restartBtn.on('pointerdown', () => {
+                restartBtn.setTint(0xff00ff);
+                this.scene.start("Level1");
+                
+            });
+
+            restartBtn.on('pointerup', () => {
+                restartBtn.clearTint();
+            });
+
+            restartBtn.on('pointerover', () => {
+                restartBtn.setScale(0.11);
+            });
+
+            restartBtn.on('pointerout', () => {
+                restartBtn.setScale(0.1);
+            });
+
+            //Botao para fazer restart game quando ha gameover
+            const clickrestart = this.add.text(200, 200, 'Restart Game!', { fontSize: '32px',fill: 'yellow' })
+            .setInteractive()
+            .on('pointerdown', () => this.scene.start("Level1"));
+
         }
 
 }
