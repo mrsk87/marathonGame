@@ -457,10 +457,14 @@ class Level1 extends Phaser.Scene {
               }
   
            addBomb() {
-          console.log("Bomba a cair");
-          var bomb = this.physics.add.sprite(Phaser.Math.Between(50, 500),0, 'bomb');
-          this.bombs.add(bomb);
-          this.bombs.body.setCollideWorldBounds(true);
+            console.log("bomb");
+            var bomb = this.physics.add.sprite(800,Phaser.Math.Between(120, 500), 'bomb');
+            bomb.body.setCollideWorldBounds(false);
+            bomb.body.setAllowGravity(false);
+            this.bomb.body.setImmovable(true);
+            this.bomb.add(bomb);
+            bomb.setScale(0.1);
+            
           
           }
   
