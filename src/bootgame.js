@@ -8,7 +8,7 @@ class bootgame extends Phaser.Scene {
 
      //this.scene.start("Level2")
 
-    this.add.text(16, 16, 'Loading Game', { fontSize: '32px', fill: '#000' });
+    this.add.text(16, 16, 'Marathon Game', { fontSize: '32px', fill: '#000' });
     console.log("bootgame");
     //this.scene.start("Level1");
 
@@ -17,7 +17,7 @@ class bootgame extends Phaser.Scene {
 
     const clickButton = this.add.text(100, 100, 'Click me!', { fill: '#0f0' })
       .setInteractive()
-      .on('pointerdown', () => this.scene.start("Level1") );
+      .on('pointerdown', () => this.scene.start("Level1", {score: 0}) );
 
     
   }

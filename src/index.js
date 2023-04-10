@@ -1,6 +1,7 @@
 import bootgame from './bootgame';
 import Level1 from './Level1';
 import Level2 from './Level2';
+import wingame from './wingame';
 //import PreloadScene from './PreloadScene';
 
 var config = {
@@ -16,7 +17,7 @@ var config = {
           debug: false
       }
   },
-  scene: [bootgame, Level1, Level2]
+  scene: [bootgame, Level1, Level2, wingame]
 };
 
 //this.scene.start("bootgame");
