@@ -8,7 +8,7 @@ class Level1 extends Phaser.Scene {
 
   preload() {
     this.load.image('sky', 'assets/sky2.png');
-    this.load.image('ground', 'assets/ground3.png');
+    this.load.image('ground', 'assets/ground1.png');
     this.load.image('object', 'assets/fire.png');
     this.load.image('finishline', 'assets/finishsprite.png');
     this.load.image('star', 'assets/star.png');
@@ -64,7 +64,7 @@ class Level1 extends Phaser.Scene {
     
 
     this.time.addEvent({
-    delay: 2000, //Phaser.Math.Between(100, 2000),
+    delay: Phaser.Math.Between(1000, 2000),
     callback: this.addObject, 
     callbackScope: this,
     loop: true
@@ -78,7 +78,7 @@ class Level1 extends Phaser.Scene {
     });
 
     this.time.addEvent({
-    delay: 1000, //Phaser.Math.Between(100, 2000),
+    delay: Phaser.Math.Between(1000, 2000),
     callback: this.addStar, 
     callbackScope: this,
     loop: true
@@ -86,14 +86,14 @@ class Level1 extends Phaser.Scene {
 
 
     this.time.addEvent({
-    delay: 2000, //Phaser.Math.Between(100, 2000),
+    delay: Phaser.Math.Between(1000, 2000),
     callback: this.addBomb,
     callbackScope: this,
     loop: true
     });
 
     this.time.addEvent({
-    delay: 2000, //Phaser.Math.Between(100, 2000),
+    delay: Phaser.Math.Between(1000, 2000),
     callback: this.addUfo,
     callbackScope: this,
     loop: true
@@ -276,43 +276,44 @@ class Level1 extends Phaser.Scene {
         
     } else {
         
-        this.player.setVelocityX(0);
-        this.physics.pause();
-        this.player.anims.play('turn');
-        this.platforms.tilePositionX = 0;
-        this.obstacule.getChildren().forEach(function(object) {
-        object.x = 0;
-        object.disableBody(true, true);
+        // this.player.setVelocityX(0);
+        // this.physics.pause();
+        // this.player.anims.play('turn');
+        // this.platforms.tilePositionX = 0;
+        // this.obstacule.getChildren().forEach(function(object) {
+        // object.x = 0;
+        // object.disableBody(true, true);
         
-        //console.log(obstacule.x );
-        });
-        this.stars.getChildren().forEach(function(star) {
-        star.x = 0;
-        star.disableBody(true, true);
+        // //console.log(obstacule.x );
+        // });
+        // this.stars.getChildren().forEach(function(star) {
+        // star.x = 0;
+        // star.disableBody(true, true);
         
-        //console.log(obstacule.x );
-        });
-        this.bombs.getChildren().forEach(function(bomb) {
-        bomb.x = 0;
-        bomb.disableBody(true, true);
+        // //console.log(obstacule.x );
+        // });
+        // this.bombs.getChildren().forEach(function(bomb) {
+        // bomb.x = 0;
+        // bomb.disableBody(true, true);
         
-        //console.log(obstacule.x );
-        });
+        // //console.log(obstacule.x );
+        // });
 
-        this.ufo.getChildren().forEach(function(ufo) {
-            ufo.x = 0;
-            ufo.disableBody(true, true);
+        // this.ufo.getChildren().forEach(function(ufo) {
+        //     ufo.x = 0;
+        //     ufo.disableBody(true, true);
             
-            //console.log(obstacule.x );
-            });
+        //     //console.log(obstacule.x );
+        //     });
 
-        this.meta.getChildren().forEach(function(meta) {
-        meta.x += 0;
-        //meta.disableBody(true, true);
-        //console.log(obstacule.x );
-        });
-        this.winGameText = this.add.text(56, 56, 'Completed', { fontSize: '32px', fill: '#000' });
-        //this.scene.start("Level2")
+        // this.meta.getChildren().forEach(function(meta) {
+        // meta.x += 0;
+        // //meta.disableBody(true, true);
+        // //console.log(obstacule.x );
+        // });
+        // this.winGameText = this.add.text(56, 56, 'Completed', { fontSize: '32px', fill: '#000' });
+        // delay: 2000;
+        this.scene.start("Level2", {score: this.score});
     }
    
 
