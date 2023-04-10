@@ -17,19 +17,56 @@ class Level1 extends Phaser.Scene {
     this.load.image('bullet', 'assets/bullet.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.image('restartBtn', 'assets/restart.png');
+    this.load.audio('dead', 'assets/dead.mp3');
+    this.load.audio('run', 'assets/run.mp3');
+    this.load.audio('gameover', 'assets/gameover.mp3');
+    this.load.audio('star', 'assets/star.mp3');
   }
 
-  
+  /**
+   * @param data passed to scene at startup
+   */
 
-  create() {
+  create(data) {
     
+    this.metaExists=false;
     this.gameOver=0;
+    this.score = data.score;
+    this.dific = this.score;
+    this.gameOver=0;
+    this.wingame=false;
+    this.cheatText = this.add.text(356, 56, 'Cheating!!', { fontSize: '32px', fill: 'orange' }).setVisible(false);
+    this.cheatText.setDepth(1);
+    console.log("score",this.score);
+
+    switch (true) {
+        case (this.dific<=30):
+            this.dificult=1;
+          console.log(this.dificult);
+          break;
+          case (this.dific >30 && this.dific<60):
+            this.dificult=2;
+          console.log(this.dificult);
+          break;
+          
+        default:
+            this.dificult=3;
+          console.log(`Full dificult.`);
+      }
+    console.log("dificult",this.dificult);
 
     
-
     
-
     console.log("Estamos no level 1");
+
+    this.dead = this.sound.add('dead');
+    this.run = this.sound.add('run');
+    this.gameover = this.sound.add('gameover');
+    this.star = this.sound.add('star');
+
+    
+
+    this.run.play();
 
     //  A simple background for our game
     this.add.image(400, 300, 'sky');
@@ -64,7 +101,7 @@ class Level1 extends Phaser.Scene {
     
 
     this.time.addEvent({
-    delay: Phaser.Math.Between(1000, 2000),
+    delay: Phaser.Math.Between(4000, 8000)/this.dificult,
     callback: this.addObject, 
     callbackScope: this,
     loop: true
@@ -78,7 +115,7 @@ class Level1 extends Phaser.Scene {
     });
 
     this.time.addEvent({
-    delay: Phaser.Math.Between(1000, 2000),
+    delay: Phaser.Math.Between(2000, 4000)/this.dificult,
     callback: this.addStar, 
     callbackScope: this,
     loop: true
@@ -86,14 +123,14 @@ class Level1 extends Phaser.Scene {
 
 
     this.time.addEvent({
-    delay: Phaser.Math.Between(1000, 2000),
+    delay: Phaser.Math.Between(4000, 8000)/this.dificult,
     callback: this.addBomb,
     callbackScope: this,
     loop: true
     });
 
     this.time.addEvent({
-    delay: Phaser.Math.Between(1000, 2000),
+    delay: Phaser.Math.Between(4000, 8000)/this.dificult,
     callback: this.addUfo,
     callbackScope: this,
     loop: true
@@ -142,8 +179,8 @@ class Level1 extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     //  The score
-    this.score = 0;
-    this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+    
+    this.scoreText = this.add.text(16, 16, 'Score: ' + this.score, { fontSize: '32px', fill: '#000' });
 
     this.physics.add.collider(this.platforms, this.obstacule, this.collisionPlat, null, this);
     this.physics.add.collider(this.platforms, this.meta, this.collisionMeta, null, this);
@@ -164,8 +201,26 @@ class Level1 extends Phaser.Scene {
 
   update() {
 
+    if(this.score>10){
+        this.dead.stop();
+        this.gameover.stop();
+        this.run.stop();
+        this.scene.start("wingame");
+    };
     
-
+    if(this.metaExists!=true ){
+        console.log("meta not exists");
+          
+        }else if(this.metaExists=true && this.gameOver!=true){
+            console.log(this.player.x);
+            console.log("meta", this.meta.x);
+            console.log("meta exists");
+            //console.log(this.meta.x);
+            if(this.meta.getChildren()[0].x<this.player.x){
+                this.wingame=true;
+            }
+            
+        };  
     
     if (this.cursors.space.isDown )
       {
@@ -180,17 +235,30 @@ class Level1 extends Phaser.Scene {
               //bomb.x = 0;
               console.log("disable bomb");
               bomb.disableBody(true, true);
-          })
+          });
+          this.ufo.getChildren().forEach(function(ufo) {
+            //bomb.x = 0;
+            console.log("disable ufo");
+            ufo.disableBody(true, true);
+        });
+        // this.bullet.getChildren().forEach(function(bullet) {
+        //     //bomb.x = 0;
+        //     console.log("disable bullet");
+        //     bullet.disableBody(true, true);
+        // })
           
           this.gameOver=0;
           
           //this.physics.add.collider(player, obstacule, collideOff, null, this);
-          console.log("Space pressed");
-          this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
-      } else if (this.cursors.space.isUp ) {
-        
-          //this.obstacule.body.setCollideWorldBounds(true);
-          //this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
+          this.cheatText.setVisible(true);
+            //this.physics.add.collider(player, obstacule, collideOff, null, this);
+            console.log("Space pressed");
+            
+        } else if (!this.cursors.space.isDown ) {
+          
+            //this.obstacule.body.setCollideWorldBounds(true);
+            //this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
+            this.cheatText.setVisible(false);
       }
 
       this.ufo.body.setVelocityX(100);
@@ -213,6 +281,7 @@ class Level1 extends Phaser.Scene {
         
     } else {
         
+        this.run.stop();
         this.player.setVelocityX(0);
         this.physics.pause();
         this.player.anims.play('turn');
@@ -239,6 +308,7 @@ class Level1 extends Phaser.Scene {
 
         this.meta.getChildren().forEach(function(meta) {
         meta.x += 0;
+       
         meta.disableBody(true, true);
         //console.log(obstacule.x );
         });
@@ -251,6 +321,7 @@ class Level1 extends Phaser.Scene {
             });
 
         this.gameOverText = this.add.text(56, 56, 'Morreu', { fontSize: '32px', fill: 'red' });
+        
 
         
 
@@ -270,50 +341,58 @@ class Level1 extends Phaser.Scene {
     if (this.wingame!=true){
         
         this.meta.getChildren().forEach(function(meta) {
-        meta.x += -5;
+        meta.x += -5 ;
         
         });
         
     } else {
         
-        // this.player.setVelocityX(0);
-        // this.physics.pause();
-        // this.player.anims.play('turn');
-        // this.platforms.tilePositionX = 0;
-        // this.obstacule.getChildren().forEach(function(object) {
-        // object.x = 0;
-        // object.disableBody(true, true);
+        this.player.setVelocityX(0);
+        this.physics.pause();
+        this.player.anims.play('turn');
+        this.platforms.tilePositionX = 0;
+        this.obstacule.getChildren().forEach(function(object) {
+        object.x = 0;
+        object.disableBody(true, true);
         
-        // //console.log(obstacule.x );
-        // });
-        // this.stars.getChildren().forEach(function(star) {
-        // star.x = 0;
-        // star.disableBody(true, true);
+        //console.log(obstacule.x );
+        });
+        this.stars.getChildren().forEach(function(star) {
+        star.x = 0;
+        star.disableBody(true, true);
         
-        // //console.log(obstacule.x );
-        // });
-        // this.bombs.getChildren().forEach(function(bomb) {
-        // bomb.x = 0;
-        // bomb.disableBody(true, true);
+        //console.log(obstacule.x );
+        });
+        this.bombs.getChildren().forEach(function(bomb) {
+        bomb.x = 0;
+        bomb.disableBody(true, true);
         
-        // //console.log(obstacule.x );
-        // });
+        //console.log(obstacule.x );
+        });
 
-        // this.ufo.getChildren().forEach(function(ufo) {
-        //     ufo.x = 0;
-        //     ufo.disableBody(true, true);
+        this.ufo.getChildren().forEach(function(ufo) {
+            ufo.x = 0;
+            ufo.disableBody(true, true);
             
-        //     //console.log(obstacule.x );
-        //     });
+            //console.log(obstacule.x );
+            });
 
-        // this.meta.getChildren().forEach(function(meta) {
-        // meta.x += 0;
-        // //meta.disableBody(true, true);
-        // //console.log(obstacule.x );
-        // });
+        this.meta.getChildren().forEach(function(meta) {
+        meta.x += 0;
+        //meta.disableBody(true, true);
+        //console.log(obstacule.x );
+        });
         // this.winGameText = this.add.text(56, 56, 'Completed', { fontSize: '32px', fill: '#000' });
         // delay: 2000;
-        this.scene.start("Level2", {score: this.score});
+        this.time.addEvent({
+            delay: 1000,
+            callback: ()=>{
+                this.scene.start("Level2", {score: this.score});
+            },
+            loop: true
+        })
+        
+        this.run.stop();
     }
    
 
@@ -405,6 +484,7 @@ class Level1 extends Phaser.Scene {
             //  Add and update the score
             this.score += 10;
             console.log(this.score);
+            this.star.play();
             this.scoreText.setText('Score: ' + this.score);
 
             
@@ -413,6 +493,13 @@ class Level1 extends Phaser.Scene {
 
           hitBomb (player, bomb)
         {
+            this.dead.play();
+            this.time.addEvent({
+                delay: 2000,
+                callback: this.gameover.play(),
+                loop: true
+            });
+            
             this.physics.pause();
 
             this.player.setTint(0xff0000);
@@ -436,6 +523,7 @@ class Level1 extends Phaser.Scene {
         addFinishLine() {
             
             console.log("Meta");
+            this.metaExists=true;
             var finishline = this.physics.add.sprite(770, 600, 'finishline');
             finishline.setScale(0.2);
             this.meta.add(finishline);
@@ -470,6 +558,12 @@ class Level1 extends Phaser.Scene {
         
         hitUfo (player, ufo)
         {
+            this.dead.play();
+            this.time.addEvent({
+                delay: 2000,
+                callback: this.gameover.play(),
+                loop: false
+            });
             this.physics.pause();
 
             this.player.setTint(0xff0000);
@@ -481,6 +575,12 @@ class Level1 extends Phaser.Scene {
 
         hitFire (player, fire)
         {
+            this.dead.play();
+            this.time.addEvent({
+                delay: 2000,
+                callback: this.gameover.play(),
+                loop: false
+            });
             this.physics.pause();
 
             this.player.setTint(0xff0000);
@@ -506,6 +606,8 @@ class Level1 extends Phaser.Scene {
             restartBtn.on('pointerdown', () => {
                 restartBtn.setTint(0xff00ff);
                 this.scene.start("Level1");
+                this.dead.stop();
+                this.gameover.stop();
                 
             });
 
@@ -527,6 +629,8 @@ class Level1 extends Phaser.Scene {
             .on('pointerdown', () => this.scene.start("Level1"));
 
         }
+
+        
 
 }
 

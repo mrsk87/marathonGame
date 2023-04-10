@@ -17,6 +17,9 @@ class Level2 extends Phaser.Scene {
       this.load.image('bullet', 'assets/bullet.png');
       this.load.spritesheet('dude2', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
       this.load.image('restartBtn', 'assets/restart.png');
+      this.load.audio('dead', 'assets/dead.mp3');
+      this.load.audio('run2', 'assets/run2.mp3');
+      this.load.audio('star', 'assets/star.mp3');
     }
   
     
@@ -24,14 +27,41 @@ class Level2 extends Phaser.Scene {
    * @param data passed to scene at startup
    */
     create(data) {
-      this.score = data.score;
-      this.gameOver=0;
+        this.metaExists=false;
+        this.score = data.score;
+        this.gameOver=0;
+        this.dific = this.score;
         this.wingame=false;
-      
+        this.cheatText = this.add.text(356, 56, 'Cheating!!', { fontSize: '32px', fill: 'orange' }).setVisible(false);
+        this.cheatText.setDepth(1);
+
+        switch (true) {
+            case (this.dific<=30):
+                this.dificult=1;
+              console.log(this.dificult);
+              break;
+              case (this.dific >30 && this.dific<=60):
+                this.dificult=2;
+              console.log(this.dificult);
+              break;
+              
+            default:
+                this.dificult=3;
+              console.log(`Full dificult.`);
+          }
+        console.log("dificult",this.dificult);
   
       
   
       console.log("Estamos no level 2");
+
+      this.dead = this.sound.add('dead');
+     this.run2 = this.sound.add('run2');
+     this.gameover = this.sound.add('gameover');
+     this.star = this.sound.add('star');
+          this.dead.stop();
+          this.gameover.stop();
+        this.run2.play();
   
       //  A simple background for our game
       this.add.image(400, 300, 'sky2');
@@ -66,13 +96,13 @@ class Level2 extends Phaser.Scene {
   
       this.fish = this.add.group();
 
-      //this.bullet = this.add.group();
+      this.bullet = this.add.group();
   
       
       
   
       this.time.addEvent({
-      delay: Phaser.Math.Between(1000, 2000),
+      delay: Phaser.Math.Between(4000, 8000)/this.dificult,
       callback: this.addObject, 
       callbackScope: this,
       loop: true
@@ -86,7 +116,7 @@ class Level2 extends Phaser.Scene {
       });
   
       this.time.addEvent({
-      delay: Phaser.Math.Between(1000, 2000),
+      delay: Phaser.Math.Between(4000, 8000)/this.dificult,
       callback: this.addStar, 
       callbackScope: this,
       loop: true
@@ -94,25 +124,25 @@ class Level2 extends Phaser.Scene {
   
   
       this.time.addEvent({
-      delay: Phaser.Math.Between(1000, 2000),
+      delay: Phaser.Math.Between(4000, 8000)/this.dificult,
       callback: this.addBomb,
       callbackScope: this,
       loop: true
       });
   
       this.time.addEvent({
-      delay: Phaser.Math.Between(1000, 2000),
+      delay: Phaser.Math.Between(4000, 8000)/this.dificult,
       callback: this.addFish,
       callbackScope: this,
       loop: true
       });
 
-    //   this.time.addEvent({
-    //     delay: Phaser.Math.Between(100, 2000),
-    //     callback: this.addBullet,
-    //     callbackScope: this,
-    //     loop: true
-    //     });
+      this.time.addEvent({
+        delay: Phaser.Math.Between(4000, 8000)/this.dificult,
+        callback: this.addBullet,
+        callbackScope: this,
+        loop: true
+        });
   
      
   
@@ -122,7 +152,7 @@ class Level2 extends Phaser.Scene {
       this.physics.add.existing(this.stars);
       this.physics.add.existing(this.bombs);
       this.physics.add.existing(this.fish);
-      //this.physics.add.existing(this.bullet);
+      this.physics.add.existing(this.bullet);
   
       
       this.player = this.physics.add.sprite(0, height, 'dude2')
@@ -159,7 +189,7 @@ class Level2 extends Phaser.Scene {
   
       //  The score
       console.log(this.score);
-      this.scoreText = this.add.text(16, 16, 'score: ' + this.score, { fontSize: '32px', fill: '#000' });
+      this.scoreText = this.add.text(16, 16, 'Score: ' + this.score, { fontSize: '32px', fill: '#000' });
   
       this.physics.add.collider(this.platforms, this.obstacule);
       this.physics.add.collider(this.player, this.platforms);
@@ -170,7 +200,7 @@ class Level2 extends Phaser.Scene {
       this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
       this.physics.add.overlap(this.player, this.bombs, this.hitBomb, null, this);
       this.physics.add.overlap(this.player, this.fish, this.hitFish, null, this);
-      //this.physics.add.overlap(this.player, this.bullet, this.hitBullet, null, this);
+      this.physics.add.overlap(this.player, this.bullet, this.hitBullet, null, this);
       this.physics.add.overlap(this.player, this.obstacule, this.hitFire, null, this);
       //this.physics.add.collider(stars, platforms);
       
@@ -178,54 +208,72 @@ class Level2 extends Phaser.Scene {
       
       
 
-  
+     
     }
   
     update() {
-        // console.log(this.player.x);
-        // console.log("meta", this.meta.x);
-        // if(this.metaExists!=true ){
-        //     console.log("meta not exists");
+        if(this.score>10){
+            this.dead.stop();
+                this.gameover.stop();
+                this.run2.stop();
+            this.scene.start("wingame");
+        };
+
+        if(this.metaExists!=true ){
+            console.log("meta not exists");
               
-        //     }else{
-        //         console.log("meta exists");
-        //         //console.log(this.meta.x);
-        //         this.meta.getChildren().forEach(function(meta) {
-                   
-        //         return meta.x.value;
-        //         //console.log(obstacule.x );
-        //         });
+            }else if(this.metaExists=true && this.gameOver!=true){
+                console.log(this.player.x);
+                console.log("meta", this.meta.x);
+                console.log("meta exists");
+                //console.log(this.meta.x);
+                if(this.meta.getChildren()[0].x<this.player.x){
+                    this.wingame=true;
+                }
                 
-        //     };  
+            };   
       
       if (this.cursors.space.isDown )
         {
           
-            console.log("Superhomem")
+            console.log(this.cheatText.text);
             this.obstacule.getChildren().forEach(function(obstacule) {
                 //obstacule.x = 0;
                 console.log("disable obstcule");
                 obstacule.disableBody(true, true);
-            })
+            });
             this.bombs.getChildren().forEach(function(bomb2) {
                 //bomb2.x = 0;
                 console.log("disable bomb2");
                 bomb2.disableBody(true, true);
+            });
+            this.fish.getChildren().forEach(function(fish) {
+                //fish.x = 0;
+                console.log("disable fish");
+                fish.disableBody(true, true);
+            })
+            this.bullet.getChildren().forEach(function(bullet) {
+                //bullet.x = 0;
+                console.log("disable bullet");
+                bullet.disableBody(true, true);
             })
             
             this.gameOver=0;
-            
+            this.cheatText.setVisible(true);
             //this.physics.add.collider(player, obstacule, collideOff, null, this);
             console.log("Space pressed");
-            this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
-        } else if (this.cursors.space.isUp ) {
+            
+        } else if (!this.cursors.space.isDown ) {
           
             //this.obstacule.body.setCollideWorldBounds(true);
             //this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
+            this.cheatText.setVisible(false);
+            
+            
         }
   
         this.fish.body.setVelocityX(100);
-          this.player.setVelocityX(5);
+          this.player.setVelocityX(6);
           
           this.player.anims.play('right', true);
   
@@ -240,10 +288,13 @@ class Level2 extends Phaser.Scene {
           });
           this.fish.getChildren().forEach(function(fish){
               fish.x+= -5;
-          })
+          });
+          this.bullet.getChildren().forEach(function(bullet){
+            bullet.x+= -5;
+        })
           
       } else {
-          
+        this.run2.stop();
           this.player.setVelocityX(0);
           this.physics.pause();
           this.player.anims.play('turn');
@@ -280,6 +331,13 @@ class Level2 extends Phaser.Scene {
               
               //console.log(obstacule.x );
               });
+          
+              this.bullet.getChildren().forEach(function(bullet) {
+                bullet.x = 0;
+                bullet.disableBody(true, true);
+                
+                //console.log(obstacule.x );
+                });  
   
           this.gameOverText = this.add.text(56, 56, 'Morreu', { fontSize: '32px', fill: 'red' });
           this.botaoRestart();
@@ -302,48 +360,52 @@ class Level2 extends Phaser.Scene {
       } else {
           
           this.player.setVelocityX(0);
-          this.physics.pause();
-          this.player.anims.play('turn');
-          this.platforms.tilePositionX = 0;
-          this.obstacule.getChildren().forEach(function(object) {
-          object.x = 0;
-          object.disableBody(true, true);
-          
-          //console.log(obstacule.x );
-          });
-          this.stars.getChildren().forEach(function(star) {
-          star.x = 0;
-          star.disableBody(true, true);
-          
-          //console.log(obstacule.x );
-          });
-          this.bombs.getChildren().forEach(function(bomb2) {
-          bomb2.x = 0;
-          bomb2.disableBody(true, true);
-          
-          //console.log(obstacule.x );
-          });
-  
-          this.fish.getChildren().forEach(function(fish) {
-              fish.x = 0;
-              fish.disableBody(true, true);
-              
-              //console.log(obstacule.x );
-              });
-            //   this.bullet.getChildren().forEach(function(bullet) {
-            //     bullet.x = 0;
-            //     bullet.disableBody(true, true);
-                
-            //     //console.log(obstacule.x );
-            //     });
-  
-          this.meta.getChildren().forEach(function(meta) {
-          meta.x += 0;
-          //meta.disableBody(true, true);
-          //console.log(obstacule.x );
-          });
-          this.winGameText = this.add.text(56, 56, 'Completed', { fontSize: '32px', fill: '#000' });
-          //this.scene.start("Level2")
+        this.physics.pause();
+        this.player.anims.play('turn');
+        this.platforms.tilePositionX = 0;
+        this.obstacule.getChildren().forEach(function(object) {
+        object.x = 0;
+        object.disableBody(true, true);
+        
+        //console.log(obstacule.x );
+        });
+        this.stars.getChildren().forEach(function(star) {
+        star.x = 0;
+        star.disableBody(true, true);
+        
+        //console.log(obstacule.x );
+        });
+        this.bombs.getChildren().forEach(function(bomb) {
+        bomb.x = 0;
+        bomb.disableBody(true, true);
+        
+        //console.log(obstacule.x );
+        });
+
+        this.fish.getChildren().forEach(function(fish) {
+            fish.x = 0;
+            fish.disableBody(true, true);
+            
+            //console.log(obstacule.x );
+            });
+
+        this.meta.getChildren().forEach(function(meta) {
+        meta.x += 0;
+        //meta.disableBody(true, true);
+        //console.log(obstacule.x );
+        });
+        // this.winGameText = this.add.text(56, 56, 'Completed', { fontSize: '32px', fill: '#000' });
+        // delay: 2000;
+        this.time.addEvent({
+            delay: 1000,
+            callback: ()=>{
+                this.scene.start("Level1", {score: this.score});
+            },
+            loop: true
+        })
+        
+        this.run2.stop();
+        
       }
      
   
@@ -408,7 +470,6 @@ class Level2 extends Phaser.Scene {
           collisionMeta (platforms, meta)
           {
             
-            
               meta.body.setCollideWorldBounds(true);
               
               
@@ -436,6 +497,7 @@ class Level2 extends Phaser.Scene {
               //  Add and update the score
               this.score += 10;
               console.log(this.score);
+              this.star.play();
               this.scoreText.setText('Score: ' + this.score);
   
               
@@ -444,6 +506,12 @@ class Level2 extends Phaser.Scene {
   
             hitBomb (player, bomb2)
           {
+            this.dead.play();
+            this.time.addEvent({
+                delay: 2000,
+                callback: this.gameover.play(),
+                loop: false
+            });
               this.physics.pause();
   
               this.player.setTint(0xff0000);
@@ -455,7 +523,7 @@ class Level2 extends Phaser.Scene {
   
           addObject() {
           
-          
+            
   
           //console.log("wave");
           var object = this.physics.add.sprite(800,110, 'wave');
@@ -502,8 +570,8 @@ class Level2 extends Phaser.Scene {
                 }
   
           addFish() {
-          //console.log("Ufo");
-          var fish = this.physics.add.sprite(800,Phaser.Math.Between(120, 400), 'fish');
+          //console.log("Fish");
+          var fish = this.physics.add.sprite(800,Phaser.Math.Between(200, 600), 'fish');
           fish.body.setCollideWorldBounds(false);
           fish.body.setAllowGravity(false);
           this.fish.body.setImmovable(true);
@@ -514,6 +582,12 @@ class Level2 extends Phaser.Scene {
           
           hitFish (player, fish)
           {
+            this.dead.play();
+            this.time.addEvent({
+                delay: 2000,
+                callback: this.gameover.play(),
+                loop: false
+            });
               this.physics.pause();
   
               this.player.setTint(0xff0000);
@@ -523,30 +597,42 @@ class Level2 extends Phaser.Scene {
               this.gameOver = true;
           }
 
-        //   addBullet() {
-        //     //console.log("Ufo");
-        //     var bullet = this.physics.add.sprite(800,Phaser.Math.Between(120, 500), 'bullet');
-        //     bullet.body.setCollideWorldBounds(false);
-        //     bullet.body.setAllowGravity(false);
-        //     this.bullet.body.setImmovable(true);
-        //     this.bullet.add(bullet);
-        //     bullet.setScale(1);
-        //     bullet.flipX=true;
-        //     }
+          addBullet() {
+            console.log("Bullet");
+            var bullet = this.physics.add.sprite(800,Phaser.Math.Between(200, 700), 'bullet');
+            bullet.body.setCollideWorldBounds(false);
+            bullet.body.setAllowGravity(false);
+            this.bullet.body.setImmovable(true);
+            this.bullet.add(bullet);
+            bullet.setScale(1);
+            bullet.flipX=true;
+            }
             
-        //     hitBullet (player, bullet)
-        //     {
-        //         this.physics.pause();
+            hitBullet (player, bullet)
+            {
+                this.dead.play();
+            this.time.addEvent({
+                delay: 2000,
+                callback: this.gameover.play(),
+                loop: false
+            });
+                this.physics.pause();
     
-        //         this.player.setTint(0xff0000);
+                this.player.setTint(0xff0000);
     
-        //         this.player.anims.play('turn');
+                this.player.anims.play('turn');
     
-        //         this.gameOver = true;
-        //     }
+                this.gameOver = true;
+            }
   
           hitFire (player, fire)
           {
+            this.dead.play();
+            this.time.addEvent({
+                delay: 2000,
+                callback: this.gameover.play(),
+                loop: false
+            });
               this.physics.pause();
   
               this.player.setTint(0xff0000);
@@ -572,6 +658,8 @@ class Level2 extends Phaser.Scene {
               restartBtn.on('pointerdown', () => {
                   restartBtn.setTint(0xff00ff);
                   this.scene.start("Level1");
+                  this.dead.stop();
+                this.gameover.stop();
                   
               });
   
@@ -590,9 +678,10 @@ class Level2 extends Phaser.Scene {
               //Botao para fazer restart game quando ha gameover
               const clickrestart = this.add.text(200, 200, 'Restart Game!', { fontSize: '32px',fill: 'yellow' })
               .setInteractive()
-              .on('pointerdown', () => this.resetLevel());
+              .on('pointerdown', () => this.scene.start("Level1"));
   
           }
+          
   
   }
   
