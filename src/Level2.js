@@ -106,21 +106,21 @@ class Level2 extends Phaser.Scene {
       
   
       this.time.addEvent({
-      delay: Phaser.Math.Between(4000, 8000)/this.dificult,
+      delay: Phaser.Math.Between(3000, 8000)/this.dificult,
       callback: this.addObject, 
       callbackScope: this,
       loop: true
       });
   
       this.time.addEvent({
-      delay: 9000, //Phaser.Math.Between(100, 2000),
+      delay: 12000, //Phaser.Math.Between(100, 2000),
       callback: this.addFinishLine, 
       callbackScope: this,
       loop: false
       });
   
       this.time.addEvent({
-      delay: Phaser.Math.Between(4000, 8000)/this.dificult,
+      delay: Phaser.Math.Between(2000, 4000)/this.dificult,
       callback: this.addStar, 
       callbackScope: this,
       loop: true
@@ -128,21 +128,21 @@ class Level2 extends Phaser.Scene {
   
   
       this.time.addEvent({
-      delay: Phaser.Math.Between(4000, 8000)/this.dificult,
+      delay: Phaser.Math.Between(3000, 8000)/this.dificult,
       callback: this.addBomb,
       callbackScope: this,
       loop: true
       });
   
       this.time.addEvent({
-      delay: Phaser.Math.Between(4000, 8000)/this.dificult,
+      delay: Phaser.Math.Between(3000, 8000)/this.dificult,
       callback: this.addFish,
       callbackScope: this,
       loop: true
       });
 
       this.time.addEvent({
-        delay: Phaser.Math.Between(4000, 8000)/this.dificult,
+        delay: Phaser.Math.Between(3000, 8000)/this.dificult,
         callback: this.addBullet,
         callbackScope: this,
         loop: true
