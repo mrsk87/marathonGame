@@ -1,4 +1,4 @@
-class Level1 extends Phaser.Scene {
+class Level2 extends Phaser.Scene {
 
     constructor() {
       super('Level2');
@@ -7,24 +7,26 @@ class Level1 extends Phaser.Scene {
     
   
     preload() {
-      this.load.image('sky', 'assets/sky3.png');
-      this.load.image('ground', 'assets/ground3.png');
+      this.load.image('sky2', 'assets/sky3.png');
+      this.load.image('ground2', 'assets/ground4.png');
       this.load.image('wave', 'assets/wave.png');
-      this.load.image('finishline', 'assets/finishsprite.png');
+      this.load.image('finishline2', 'assets/finishsprite.png');
       this.load.image('star', 'assets/star.png');
-      this.load.image('ufo', 'assets/ufo.png');
-      this.load.image('bomb', 'assets/bomb.png');
+      this.load.image('fish', 'assets/fish.png');
+      this.load.image('bomb2', 'assets/bomb.png');
       this.load.image('bullet', 'assets/bullet.png');
-      this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+      this.load.spritesheet('dude2', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
       this.load.image('restartBtn', 'assets/restart.png');
     }
   
     
-  
-    create() {
-      
+    /**
+   * @param data passed to scene at startup
+   */
+    create(data) {
+      this.score = data.score;
       this.gameOver=0;
-  
+        this.wingame=false;
       
   
       
@@ -32,22 +34,24 @@ class Level1 extends Phaser.Scene {
       console.log("Estamos no level 2");
   
       //  A simple background for our game
-      this.add.image(400, 300, 'sky');
+      this.add.image(400, 300, 'sky2');
     
       
   
       const { height, width } = this.sys.game.config;
       this.gameSpeed = 5;
-      this.platforms = this.add.tileSprite(0, height, width, 26, 'ground').setOrigin(0, 1);
-      
-      
-      this.physics.add.existing(this.platforms);
-  
-      // set the TileSprite's physics properties
-      this.platforms.body.setCollideWorldBounds(true);
-      this.platforms.body.setBounce(0);
-      //platforms.body.setVelocity(200, 200);
-  
+      this.platforms = this.physics.add.staticGroup();
+
+        //  Here we create the ground2.
+        //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+        
+        this.platforms = this.physics.add.staticGroup();
+
+        //  Here we create the ground2.
+        //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+        this.platforms.create(0, 150, 'ground2').setScale(0.7).refreshBody();
+
+        
       
   
       //add variables to functions 
@@ -60,13 +64,15 @@ class Level1 extends Phaser.Scene {
   
       this.bombs = this.add.group();
   
-      this.ufo = this.add.group();
+      this.fish = this.add.group();
+
+      //this.bullet = this.add.group();
   
       
       
   
       this.time.addEvent({
-      delay: 2000, //Phaser.Math.Between(100, 2000),
+      delay: Phaser.Math.Between(1000, 2000),
       callback: this.addObject, 
       callbackScope: this,
       loop: true
@@ -80,7 +86,7 @@ class Level1 extends Phaser.Scene {
       });
   
       this.time.addEvent({
-      delay: 1000, //Phaser.Math.Between(100, 2000),
+      delay: Phaser.Math.Between(1000, 2000),
       callback: this.addStar, 
       callbackScope: this,
       loop: true
@@ -88,18 +94,25 @@ class Level1 extends Phaser.Scene {
   
   
       this.time.addEvent({
-      delay: 2000, //Phaser.Math.Between(100, 2000),
+      delay: Phaser.Math.Between(1000, 2000),
       callback: this.addBomb,
       callbackScope: this,
       loop: true
       });
   
       this.time.addEvent({
-      delay: 2000, //Phaser.Math.Between(100, 2000),
-      callback: this.addUfo,
+      delay: Phaser.Math.Between(1000, 2000),
+      callback: this.addFish,
       callbackScope: this,
       loop: true
       });
+
+    //   this.time.addEvent({
+    //     delay: Phaser.Math.Between(100, 2000),
+    //     callback: this.addBullet,
+    //     callbackScope: this,
+    //     loop: true
+    //     });
   
      
   
@@ -108,10 +121,11 @@ class Level1 extends Phaser.Scene {
       this.physics.add.existing(this.meta);
       this.physics.add.existing(this.stars);
       this.physics.add.existing(this.bombs);
-      this.physics.add.existing(this.ufo);
+      this.physics.add.existing(this.fish);
+      //this.physics.add.existing(this.bullet);
   
       
-      this.player = this.physics.add.sprite(0, height, 'dude')
+      this.player = this.physics.add.sprite(0, height, 'dude2')
      .setCollideWorldBounds(true)
      .setGravityY(-3000)
      .setOrigin(0, 1);
@@ -122,20 +136,20 @@ class Level1 extends Phaser.Scene {
   
      this.anims.create({
           key: 'left',
-          frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+          frames: this.anims.generateFrameNumbers('dude2', { start: 0, end: 3 }),
           frameRate: 10,
           repeat: -1
       });
   
      this.anims.create({
           key: 'turn',
-          frames: [ { key: 'dude', frame: 4 } ],
+          frames: [ { key: 'dude2', frame: 4 } ],
           frameRate: 20
       });
   
       this.anims.create({
           key: 'right',
-          frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+          frames: this.anims.generateFrameNumbers('dude2', { start: 5, end: 8 }),
           frameRate: 10,
           repeat: -1
       });
@@ -144,31 +158,45 @@ class Level1 extends Phaser.Scene {
       this.cursors = this.input.keyboard.createCursorKeys();
   
       //  The score
-      this.score = 0;
-      this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+      console.log(this.score);
+      this.scoreText = this.add.text(16, 16, 'score: ' + this.score, { fontSize: '32px', fill: '#000' });
   
-      this.physics.add.collider(this.platforms, this.obstacule, this.collisionPlat, null, this);
+      this.physics.add.collider(this.platforms, this.obstacule);
       this.physics.add.collider(this.player, this.platforms);
-      this.physics.add.collider(this.platforms, this.meta, this.collisionMeta, null, this);
+      this.physics.add.collider(this.platforms, this.meta);
       //this.physics.add.collider(this.platforms, this.stars, this.collisionPlatStar, null, this);
       this.physics.add.collider(this.player, this.obstacule, this.collidePlayerObstacule, null, this);
       this.physics.add.collider(this.player, this.meta, this.collideMeta, null, this);
       this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
       this.physics.add.overlap(this.player, this.bombs, this.hitBomb, null, this);
-      this.physics.add.overlap(this.player, this.ufo, this.hitUfo, null, this);
+      this.physics.add.overlap(this.player, this.fish, this.hitFish, null, this);
+      //this.physics.add.overlap(this.player, this.bullet, this.hitBullet, null, this);
       this.physics.add.overlap(this.player, this.obstacule, this.hitFire, null, this);
       //this.physics.add.collider(stars, platforms);
       
   
       
-  
+      
+
   
     }
   
     update() {
-  
-      
-  
+        // console.log(this.player.x);
+        // console.log("meta", this.meta.x);
+        // if(this.metaExists!=true ){
+        //     console.log("meta not exists");
+              
+        //     }else{
+        //         console.log("meta exists");
+        //         //console.log(this.meta.x);
+        //         this.meta.getChildren().forEach(function(meta) {
+                   
+        //         return meta.x.value;
+        //         //console.log(obstacule.x );
+        //         });
+                
+        //     };  
       
       if (this.cursors.space.isDown )
         {
@@ -179,10 +207,10 @@ class Level1 extends Phaser.Scene {
                 console.log("disable obstcule");
                 obstacule.disableBody(true, true);
             })
-            this.bombs.getChildren().forEach(function(bomb) {
-                //bomb.x = 0;
-                console.log("disable bomb");
-                bomb.disableBody(true, true);
+            this.bombs.getChildren().forEach(function(bomb2) {
+                //bomb2.x = 0;
+                console.log("disable bomb2");
+                bomb2.disableBody(true, true);
             })
             
             this.gameOver=0;
@@ -196,7 +224,7 @@ class Level1 extends Phaser.Scene {
             //this.gameOverText = this.add.text(56, 56, 'SuperHomem', { fontSize: '32px', fill: '#000' });
         }
   
-        this.ufo.body.setVelocityX(100);
+        this.fish.body.setVelocityX(100);
           this.player.setVelocityX(5);
           
           this.player.anims.play('right', true);
@@ -210,8 +238,8 @@ class Level1 extends Phaser.Scene {
           object.x += -5;
           //console.log(obstacule.x );
           });
-          this.ufo.getChildren().forEach(function(ufo){
-              ufo.x+= -5;
+          this.fish.getChildren().forEach(function(fish){
+              fish.x+= -5;
           })
           
       } else {
@@ -233,9 +261,9 @@ class Level1 extends Phaser.Scene {
           
           //console.log(obstacule.x );
           });
-          this.bombs.getChildren().forEach(function(bomb) {
-          bomb.x = 0;
-          bomb.disableBody(true, true);
+          this.bombs.getChildren().forEach(function(bomb2) {
+          bomb2.x = 0;
+          bomb2.disableBody(true, true);
           
           //console.log(obstacule.x );
           });
@@ -246,29 +274,23 @@ class Level1 extends Phaser.Scene {
           //console.log(obstacule.x );
           });
   
-          this.ufo.getChildren().forEach(function(ufo) {
-              ufo.x = 0;
-              ufo.disableBody(true, true);
+          this.fish.getChildren().forEach(function(fish) {
+              fish.x = 0;
+              fish.disableBody(true, true);
               
               //console.log(obstacule.x );
               });
   
           this.gameOverText = this.add.text(56, 56, 'Morreu', { fontSize: '32px', fill: 'red' });
-  
-          
-  
           this.botaoRestart();
-                  
-             
-              
-          
-          
               
       }
   
       if(this.colide=true){
           this.player.setVelocityX(0);
       }
+     
+              
   
       if (this.wingame!=true){
           
@@ -295,19 +317,25 @@ class Level1 extends Phaser.Scene {
           
           //console.log(obstacule.x );
           });
-          this.bombs.getChildren().forEach(function(bomb) {
-          bomb.x = 0;
-          bomb.disableBody(true, true);
+          this.bombs.getChildren().forEach(function(bomb2) {
+          bomb2.x = 0;
+          bomb2.disableBody(true, true);
           
           //console.log(obstacule.x );
           });
   
-          this.ufo.getChildren().forEach(function(ufo) {
-              ufo.x = 0;
-              ufo.disableBody(true, true);
+          this.fish.getChildren().forEach(function(fish) {
+              fish.x = 0;
+              fish.disableBody(true, true);
               
               //console.log(obstacule.x );
               });
+            //   this.bullet.getChildren().forEach(function(bullet) {
+            //     bullet.x = 0;
+            //     bullet.disableBody(true, true);
+                
+            //     //console.log(obstacule.x );
+            //     });
   
           this.meta.getChildren().forEach(function(meta) {
           meta.x += 0;
@@ -359,9 +387,9 @@ class Level1 extends Phaser.Scene {
   
           collideMeta (player, meta)
           {
-              
+            
               this.wingame=true;
-                  
+              
               
               
           }
@@ -379,7 +407,8 @@ class Level1 extends Phaser.Scene {
   
           collisionMeta (platforms, meta)
           {
-              console.log("Meta");
+            
+            
               meta.body.setCollideWorldBounds(true);
               
               
@@ -413,7 +442,7 @@ class Level1 extends Phaser.Scene {
               
            }
   
-            hitBomb (player, bomb)
+            hitBomb (player, bomb2)
           {
               this.physics.pause();
   
@@ -428,8 +457,8 @@ class Level1 extends Phaser.Scene {
           
           
   
-          console.log("wave");
-          var object = this.physics.add.sprite(800,90, 'wave');
+          //console.log("wave");
+          var object = this.physics.add.sprite(800,110, 'wave');
           object.body.setCollideWorldBounds(false);
           object.body.setAllowGravity(false);
           //this.obstacule.body.setImmovable(true);
@@ -442,43 +471,48 @@ class Level1 extends Phaser.Scene {
           addFinishLine() {
               
               console.log("Meta");
-              var finishline = this.physics.add.sprite(770, 600, 'finishline');
-              finishline.setScale(0.2);
-              this.meta.add(finishline);
-              this.meta.body.setCollideWorldBounds(true);
+              this.metaExists=true;
+              var finishline2 = this.physics.add.sprite(800, 190, 'finishline2');
+              finishline2.setScale(0.2);
+              this.meta.add(finishline2);
+              finishline2.flipY=true;
+              this.meta.body.setImmovable(true);
+              finishline2.body.setCollideWorldBounds(false);
+              finishline2.body.setAllowGravity(false);
+              
+
+             
+              
               }
   
           addStar() {
-              console.log("Estrela a cair");
+              //console.log("Estrela a cair");
               var star = this.physics.add.sprite(Phaser.Math.Between(50, 500),0, 'star');
               this.stars.add(star);
               this.stars.body.setCollideWorldBounds(true);
               
               }
   
-           addBomb() {
-            console.log("bomb");
-            var bomb = this.physics.add.sprite(800,Phaser.Math.Between(120, 500), 'bomb');
-            bomb.body.setCollideWorldBounds(false);
-            bomb.body.setAllowGravity(false);
-            this.bomb.body.setImmovable(true);
-            this.bomb.add(bomb);
-            bomb.setScale(0.1);
-            
-          
-          }
+              addBomb() {
+                console.log("Bomba a cair");
+                var bomb2 = this.physics.add.sprite(Phaser.Math.Between(50, 500),0, 'bomb2');
+                this.bombs.add(bomb2);
+                this.bombs.body.setCollideWorldBounds(true);
+                
+                }
   
-          addUfo() {
-          console.log("Ufo");
-          var ufo = this.physics.add.sprite(800,Phaser.Math.Between(120, 500), 'ufo');
-          ufo.body.setCollideWorldBounds(false);
-          ufo.body.setAllowGravity(false);
-          this.ufo.body.setImmovable(true);
-          this.ufo.add(ufo);
-          ufo.setScale(0.1);
+          addFish() {
+          //console.log("Ufo");
+          var fish = this.physics.add.sprite(800,Phaser.Math.Between(120, 400), 'fish');
+          fish.body.setCollideWorldBounds(false);
+          fish.body.setAllowGravity(false);
+          this.fish.body.setImmovable(true);
+          this.fish.add(fish);
+          fish.setScale(0.5);
+          fish.flipX=true;
           }
           
-          hitUfo (player, ufo)
+          hitFish (player, fish)
           {
               this.physics.pause();
   
@@ -488,6 +522,28 @@ class Level1 extends Phaser.Scene {
   
               this.gameOver = true;
           }
+
+        //   addBullet() {
+        //     //console.log("Ufo");
+        //     var bullet = this.physics.add.sprite(800,Phaser.Math.Between(120, 500), 'bullet');
+        //     bullet.body.setCollideWorldBounds(false);
+        //     bullet.body.setAllowGravity(false);
+        //     this.bullet.body.setImmovable(true);
+        //     this.bullet.add(bullet);
+        //     bullet.setScale(1);
+        //     bullet.flipX=true;
+        //     }
+            
+        //     hitBullet (player, bullet)
+        //     {
+        //         this.physics.pause();
+    
+        //         this.player.setTint(0xff0000);
+    
+        //         this.player.anims.play('turn');
+    
+        //         this.gameOver = true;
+        //     }
   
           hitFire (player, fire)
           {
@@ -504,7 +560,7 @@ class Level1 extends Phaser.Scene {
   
           resetLevel(){
               this.gameOver = 0;
-              this.scene.start("bootgame");
+              this.scene.start("Level1");
           }
   
           botaoRestart(){
@@ -534,11 +590,11 @@ class Level1 extends Phaser.Scene {
               //Botao para fazer restart game quando ha gameover
               const clickrestart = this.add.text(200, 200, 'Restart Game!', { fontSize: '32px',fill: 'yellow' })
               .setInteractive()
-              .on('pointerdown', () => this.scene.restart("Level2"));
+              .on('pointerdown', () => this.resetLevel());
   
           }
   
   }
   
-  export default Level1;
+  export default Level2;
   
