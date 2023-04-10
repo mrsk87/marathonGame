@@ -13,26 +13,7 @@ class bootgame extends Phaser.Scene {
   create() {
 
     this.add.image(400, 300, 'skyBoot');
-       //this.scene.start("Level2")
-
-      //  this.win = this.sound.add('win');
-      //     this.win.play();
-
-     //this.scene.start("Level2")
-
-    // this.add.text(306, 306, 'Marathon Game', { fontSize: '32px', fill: '#000' });
-    // console.log("bootgame");
-    // //this.scene.start("Level1");
-
-    
-    
     this.startButon();
-
-
-    // const clickButton = this.add.text(300, 300, 'Start Game!', { fill: '#000' })
-    //   .setInteractive()
-    //   .on('pointerdown', () => this.scene.start("Level1", {score: 0}) );
-
     
   }
 
@@ -48,10 +29,6 @@ class bootgame extends Phaser.Scene {
         
         
     });
-
-    
-
-    
 
 }
 
