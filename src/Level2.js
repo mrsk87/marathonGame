@@ -239,7 +239,7 @@ class Level2 extends Phaser.Scene {
                 
             };   
       
-      if (this.cursors.space.isDown )
+      if (this.cursors.space.isDown && this.gameOver!=true )
         {
           
             console.log(this.cheatText.text);

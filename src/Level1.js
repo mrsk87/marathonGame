@@ -201,6 +201,7 @@ class Level1 extends Phaser.Scene {
 
   update() {
 
+
     if(this.score>99){
         this.dead.stop();
         this.gameover.stop();
@@ -222,7 +223,7 @@ class Level1 extends Phaser.Scene {
             
         };  
     
-    if (this.cursors.space.isDown )
+    if (this.cursors.space.isDown && this.gameOver!=true)
       {
         
           console.log("Superhomem")

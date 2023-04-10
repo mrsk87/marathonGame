@@ -37,7 +37,7 @@ class wingame extends Phaser.Scene {
 
         restartBtn.on('pointerdown', () => {
             restartBtn.setTint(0xff00ff);
-            this.scene.start("Level1", {score: 0});
+            this.scene.start("bootgame");
             
             
         });
@@ -57,7 +57,7 @@ class wingame extends Phaser.Scene {
         //Botao para fazer restart game quando ha gameover
         const clickrestart = this.add.text(300, 400, 'Restart Game!', { fontSize: '32px',fill: 'red' })
         .setInteractive()
-        .on('pointerdown', () => this.scene.start("Level1", {score: 0}));
+        .on('pointerdown', () => this.scene.start("bootgame"));
 
     }
   
