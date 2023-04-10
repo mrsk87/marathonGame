@@ -5,32 +5,32 @@ class bootgame extends Phaser.Scene {
   }
 
   preload(){
-    this.load.image('skyBoot', 'assets/skyBoot.png');
-    this.load.image('startbtn', 'assets/start.png');
+    this.load.image('skyBoot', 'assets/sky.png');
+    //this.load.image('startbtn', 'assets/start.png');
     //this.load.audio('win', 'assets/wingame.mp3');
 }
 
   create() {
 
     this.add.image(400, 300, 'skyBoot');
-    this.startButon();
+    //this.startButon();
     
   }
 
-  startButon(){
-    //Botao restart
-    const startBtn = this.add.image(400, 300, 'startbtn')
-    .setScale(1)
-    startBtn.setInteractive();
+  // startButon(){
+  //   //Botao restart
+  //   const startBtn = this.add.image(400, 300, 'startbtn')
+  //   .setScale(1)
+  //   startBtn.setInteractive();
 
-    startBtn.on('pointerdown', () => {
+  //   startBtn.on('pointerdown', () => {
         
-        this.scene.start("Level1", {score: 0});
+  //       this.scene.start("Level1", {score: 0});
         
         
-    });
+  //   });
 
-}
+// }
 
 }
 
