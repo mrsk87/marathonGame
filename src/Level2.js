@@ -82,6 +82,8 @@ class Level2 extends Phaser.Scene {
         this.platforms.create(0, 150, 'ground2').setScale(0.7).refreshBody();
 
         
+
+        
       
   
       //add variables to functions 
@@ -97,6 +99,8 @@ class Level2 extends Phaser.Scene {
       this.fish = this.add.group();
 
       this.bullet = this.add.group();
+
+      
   
       
       
@@ -143,6 +147,8 @@ class Level2 extends Phaser.Scene {
         callbackScope: this,
         loop: true
         });
+
+        
   
      
   
@@ -212,7 +218,7 @@ class Level2 extends Phaser.Scene {
     }
   
     update() {
-        if(this.score>10){
+        if(this.score>99){
             this.dead.stop();
                 this.gameover.stop();
                 this.run2.stop();
@@ -507,11 +513,7 @@ class Level2 extends Phaser.Scene {
             hitBomb (player, bomb2)
           {
             this.dead.play();
-            this.time.addEvent({
-                delay: 2000,
-                callback: this.gameover.play(),
-                loop: false
-            });
+            this.gameover.play()
               this.physics.pause();
   
               this.player.setTint(0xff0000);
@@ -580,14 +582,11 @@ class Level2 extends Phaser.Scene {
           fish.flipX=true;
           }
           
+          
           hitFish (player, fish)
           {
             this.dead.play();
-            this.time.addEvent({
-                delay: 2000,
-                callback: this.gameover.play(),
-                loop: false
-            });
+            this.gameover.play()
               this.physics.pause();
   
               this.player.setTint(0xff0000);
@@ -611,11 +610,7 @@ class Level2 extends Phaser.Scene {
             hitBullet (player, bullet)
             {
                 this.dead.play();
-            this.time.addEvent({
-                delay: 2000,
-                callback: this.gameover.play(),
-                loop: false
-            });
+                this.gameover.play()
                 this.physics.pause();
     
                 this.player.setTint(0xff0000);
@@ -628,11 +623,7 @@ class Level2 extends Phaser.Scene {
           hitFire (player, fire)
           {
             this.dead.play();
-            this.time.addEvent({
-                delay: 2000,
-                callback: this.gameover.play(),
-                loop: false
-            });
+            this.gameover.play()
               this.physics.pause();
   
               this.player.setTint(0xff0000);
@@ -657,7 +648,7 @@ class Level2 extends Phaser.Scene {
   
               restartBtn.on('pointerdown', () => {
                   restartBtn.setTint(0xff00ff);
-                  this.scene.start("Level1");
+                  this.scene.start("Level1", {score: 0});
                   this.dead.stop();
                 this.gameover.stop();
                   
@@ -678,7 +669,7 @@ class Level2 extends Phaser.Scene {
               //Botao para fazer restart game quando ha gameover
               const clickrestart = this.add.text(200, 200, 'Restart Game!', { fontSize: '32px',fill: 'yellow' })
               .setInteractive()
-              .on('pointerdown', () => this.scene.start("Level1"));
+              .on('pointerdown', () => this.scene.start("Level1", {score: 0}));
   
           }
           

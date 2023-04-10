@@ -201,7 +201,7 @@ class Level1 extends Phaser.Scene {
 
   update() {
 
-    if(this.score>10){
+    if(this.score>99){
         this.dead.stop();
         this.gameover.stop();
         this.run.stop();
@@ -494,11 +494,7 @@ class Level1 extends Phaser.Scene {
           hitBomb (player, bomb)
         {
             this.dead.play();
-            this.time.addEvent({
-                delay: 2000,
-                callback: this.gameover.play(),
-                loop: true
-            });
+            this.gameover.play()
             
             this.physics.pause();
 
@@ -559,11 +555,7 @@ class Level1 extends Phaser.Scene {
         hitUfo (player, ufo)
         {
             this.dead.play();
-            this.time.addEvent({
-                delay: 2000,
-                callback: this.gameover.play(),
-                loop: false
-            });
+            this.gameover.play()
             this.physics.pause();
 
             this.player.setTint(0xff0000);
@@ -576,11 +568,7 @@ class Level1 extends Phaser.Scene {
         hitFire (player, fire)
         {
             this.dead.play();
-            this.time.addEvent({
-                delay: 2000,
-                callback: this.gameover.play(),
-                loop: false
-            });
+            this.gameover.play()
             this.physics.pause();
 
             this.player.setTint(0xff0000);
@@ -605,7 +593,7 @@ class Level1 extends Phaser.Scene {
 
             restartBtn.on('pointerdown', () => {
                 restartBtn.setTint(0xff00ff);
-                this.scene.start("Level1");
+                this.scene.start("Level1", {score: 0});
                 this.dead.stop();
                 this.gameover.stop();
                 
@@ -626,7 +614,7 @@ class Level1 extends Phaser.Scene {
             //Botao para fazer restart game quando ha gameover
             const clickrestart = this.add.text(200, 200, 'Restart Game!', { fontSize: '32px',fill: 'yellow' })
             .setInteractive()
-            .on('pointerdown', () => this.scene.start("Level1"));
+            .on('pointerdown', () => this.scene.start("Level1", {score: 0}));
 
         }
 
